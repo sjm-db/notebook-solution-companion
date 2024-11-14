@@ -17,13 +17,10 @@ from databricks.sdk.service.compute import CreateCluster
 def init_locals():
 
     # noinspection PyGlobalUndefined
-    global spark, sc, dbutils
+    global spark, dbutils
 
     try: spark
     except NameError:spark = SparkSession.builder.getOrCreate()
-
-    try: sc
-    except NameError: sc = spark.sparkContext
 
     try: dbutils
     except NameError:
@@ -34,10 +31,10 @@ def init_locals():
             import IPython
             dbutils = IPython.get_ipython().user_ns["dbutils"]
 
-    return sc, spark, dbutils
+    return spark, dbutils
 
 
-sc, spark, dbutils = init_locals()
+spark, dbutils = init_locals()
 
 class NotebookSolutionCompanion():
   """
@@ -415,6 +412,7 @@ class NotebookSolutionCompanion():
     assert self.test_result_state == "SUCCESS", f"Job Run failed: please investigate at: {self.workspace_url}#job/{self.job_id}/run/{self.run_id}"
 
 # COMMAND ----------
+
 
 
 # COMMAND ----------
