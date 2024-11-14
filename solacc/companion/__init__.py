@@ -24,12 +24,8 @@ def init_locals():
 
     try: dbutils
     except NameError:
-        if spark.conf.get("spark.databricks.service.client.enabled") == "true":
             from pyspark.dbutils import DBUtils
             dbutils = DBUtils(spark)
-        else:
-            import IPython
-            dbutils = IPython.get_ipython().user_ns["dbutils"]
 
     return spark, dbutils
 
@@ -49,7 +45,7 @@ class NotebookSolutionCompanion():
     self.job_name = f"[RUNNER] {self.solution_code_name} | {hash_code}" # use hash to differentiate solutions deployed to different paths
     self.client = DBAcademyRestClient() # part of this code uses dbacademy rest client as the SDK migration work is ongoing
     self.workspace_url = self.get_workspace_url()
-    self.print_html = int(spark.conf.get("spark.databricks.clusterUsageTags.sparkVersion").split(".")[0].split("__")[-1]) >= 11 # below DBR 11, html print is not supported
+    self.print_html = True
     self.username = self.get_username()
     self.cloud = self.get_cloud()
   
@@ -65,9 +61,11 @@ class NotebookSolutionCompanion():
 
   @staticmethod
   def get_workspace_client() -> WorkspaceClient: 
-    ctx = dbutils.notebook.entry_point.getDbutils().notebook().getContext()
-    DATABRICKS_TOKEN = ctx.apiToken().getOrElse(None)
-    DATABRICKS_URL = ctx.apiUrl().getOrElse(None)
+    from dbruntime.databricks_repl_context import get_context
+
+    ctx = get_context()
+    DATABRICKS_TOKEN = ctx.apiToken
+    DATABRICKS_URL = ctx.apiUrl
     return WorkspaceClient(host=DATABRICKS_URL, token=DATABRICKS_TOKEN)
 
   def get_username(self) -> str:
