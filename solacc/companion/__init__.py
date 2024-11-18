@@ -110,9 +110,8 @@ class NotebookSolutionCompanion():
           print(f"""Reset the {params["name"]} job at: {self.workspace_url}/#job/{job_id}/tasks""")
           
     else:
-      # json_response = self.client.execute_post_json(f"{self.client.endpoint}/api/2.1/jobs/create", params)
-      create_job_request = CreateJob().from_dict(params)
-      job_id = self.w.jobs.create(request=create_job_request).job_id
+      json_response = self.client.execute_post_json(f"{self.client.endpoint}/api/2.1/jobs/create", params)
+      job_id = json_response["job_id"]
       if self.print_html:
           displayHTML(f"""Created <a href="/#job/{job_id}/tasks" target="_blank">{params["name"]}</a> job""")
       else:
